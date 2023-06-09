@@ -1,4 +1,4 @@
-const { Tweet, User } = require('../models')
+const { Tweet, User, Reply } = require('../models')
 
 const tweetController = {
   getTweets: (req, res, next) => {
@@ -16,6 +16,17 @@ const tweetController = {
       .then(tweet => {
         console.log(tweet)
         res.json( tweet )
+      })
+      .catch(err => next(err))
+  },
+  getReplies: (req, res, next) => {
+    const tweetId = req.params.tweetId
+    return Reply.findAll({
+      where: {tweetId}
+    })
+      .then(replies => {
+        console.log(replies)
+        res.json(replies)
       })
       .catch(err => next(err))
   }
