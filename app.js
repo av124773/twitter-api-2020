@@ -3,19 +3,24 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const express = require('express')
+const bodyParser = require('body-parser')
 const routes = require('./routes')
 
-const helpers = require('./_helpers');
+const helpers = require('./_helpers')
+const methodOverride = require('method-override')
 
-const usePassport = require('./config/passport')
+const passport = require('./config/passport')
 
 const app = express()
 const port = 3000
 
 // middleware
+app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(usePassport.initialize())
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(methodOverride('_method'))
 
 // usePassport(app)
 

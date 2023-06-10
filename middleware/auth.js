@@ -1,5 +1,6 @@
 const passport = require('../config/passport')
 const helpers = require('../_helpers') 
+const jwt = require('jsonwebtoken')
 
 //驗證 authenticated
 const authenticated = (req, res, next) => {
