@@ -7,8 +7,11 @@ const users = require('./modules/users')
 const tweets = require('./modules/tweets')
 const followships = require('./modules/followships')
 
+
 const adminController = require('../controllers/admin-controller')
 const userController = require('../controllers/user-controller')
+const { apiErrorHandler } = require('../middleware/error-handler')
+
 
 const { authenticated, isUser, isAdmin, authenticatedUser, authenticatedAdmin } = require('../middleware/auth')
 
@@ -21,6 +24,8 @@ router.use('/api/users', authenticated, authenticatedUser, users)
 router.use('/api/tweets', tweets)
 router.use('/api/followships', followships)
 
+
+router.use('/', apiErrorHandler)
 router.use('/', (req, res) => res.send('this is home page.')) // for testing
 
 module.exports = router
