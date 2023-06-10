@@ -6,7 +6,7 @@ const JWTStrategy = passportJWT.Strategy
 const ExtractJWT = passportJWT.ExtractJwt
 
 const bcrypt = require('bcryptjs')
-// require('dotenv').config();
+require('dotenv').config()
 
 const { User } = require('../models')
 
@@ -18,10 +18,10 @@ passport.use(new LocalStrategy({
 }, async (email, password, done) => {
   try {
     const user = await User.findOne({
-      where: { email }, // user checking by email
-      include: [
-        { model: Tweet, as: 'Tweets', order: [['createdAt', 'DESC']] }
-      ]
+      where: { email } // user checking by email
+      // include: [
+      //   { model: Tweet, as: 'Tweets', order: [['createdAt', 'DESC']] }
+      // ]
     })
     if (!user) {
       return done(null, false, { message: '使用者不存在', status: 401 });
