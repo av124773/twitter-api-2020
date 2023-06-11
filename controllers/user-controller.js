@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const bcrypt = require('bcryptjs')
 const { User, Tweet, Reply, Like, Followship } = require('../models')
+const helpers = require('../_helpers')
 
 const userController = {
   signIn: async (req, res, next) => {
