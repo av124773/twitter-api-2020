@@ -14,6 +14,7 @@ const userController = require('../controllers/user-controller')
 
 const { authenticated, isUser, isAdmin, authenticatedUser, authenticatedAdmin } = require('../middleware/auth')
 
+router.post('/api/users', userController.signUp) //註冊功能
 router.post('/api/admin/signin', passport.authenticate('local', { session: false }), isAdmin, adminController.signIn)
 router.post('/api/users/signin', passport.authenticate('local', { session: false }), isUser, userController.signIn)
 
