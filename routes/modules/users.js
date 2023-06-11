@@ -6,7 +6,6 @@ const userController = require('../../controllers/user-controller')
 
 const { isUser, authenticatedUser } = require('../../middleware/auth')
 
-router.post('/', userController.signUp) //註冊功能
 router.get('/:id', userController.getUserData)
 router.put('/:id', userController.editUserData)
 router.get('/:userId/tweets', userController.getUserTweets)
