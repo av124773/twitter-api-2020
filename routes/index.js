@@ -6,6 +6,7 @@ const admin = require('./modules/admin')
 const users = require('./modules/users')
 const tweets = require('./modules/tweets')
 const followships = require('./modules/followships')
+const auth = require('./modules/auth')
 
 const adminController = require('../controllers/admin-controller')
 const userController = require('../controllers/user-controller')
@@ -36,6 +37,7 @@ router.use('/api/admin', authenticated, authenticatedAdmin, admin)
 router.use('/api/users', authenticated, authenticatedUser, users)
 router.use('/api/tweets', authenticated, tweets)
 router.use('/api/followships', followships)
+router.use('/api/auth', auth)
 
 router.use('/', apiErrorHandler)
 router.use('/', (req, res) => res.send('this is home page.')) // for testing
