@@ -11,7 +11,7 @@ const { apiErrorHandler } = require('../middleware/error-handler')
 
 const adminController = require('../controllers/admin-controller')
 const userController = require('../controllers/user-controller')
-const { apiErrorHandler } = require('../middleware/error-handler')
+
 const { authenticated, isUser, isAdmin, authenticatedUser, authenticatedAdmin } = require('../middleware/auth')
 
 router.post('/api/admin/signin', (req, res, next) => {
