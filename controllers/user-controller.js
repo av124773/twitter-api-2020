@@ -1,8 +1,11 @@
 const jwt = require('jsonwebtoken')
 const { imgurFileHandler } = require('../helpers/file-helpers')
+const imgur = require('imgur')
+imgur.setAPIUrl('https://api.imgur.com/3/')
 const bcrypt = require('bcryptjs')
 const { User, Tweet, Reply, Like, Followship } = require('../models')
 const helpers = require('../_helpers')
+const { Op } = require('sequelize')
 
 const userController = {
   signIn: async (req, res, next) => {
@@ -25,7 +28,7 @@ const userController = {
     try {
       const { account, name, email, password, checkPassword } = req.body
       if (!account || !name || !email || !password || !checkPassword) throw new Error('Information not complete')
-      if (req.body.password !== req.body.passwordCheck) throw new Error('Passwords do not match')
+      if (password !== checkPassword) throw new Error('Passwords do not match')
 
       const user = await User.findOne({
         where: {
@@ -47,8 +50,9 @@ const userController = {
         createAt: new Date(),
         updatedAt: new Date()
       })
-      res.json({
-        status: 'success', message: 'Account created successfully'
+      res.status(200).json({
+        status: 'success',
+        message: 'Account created successfully'
       })
     } catch (err) {
       next(err)
@@ -57,8 +61,13 @@ const userController = {
   getUserData: async (req, res, next) => {
     try {
       const user = await User.findByPk(req.params.id);
-      if (!user) throw new Error('This user does not exist');
-      res.json({ status: 'success', user: user.toJSON() });
+      if (!user) throw new Error('This user does not exist')
+    
+      const userData = {
+        ...user.toJSON()
+      }
+      res.status(200).json(userData)
+      // res.json({ status: 'success', user: user.toJSON(userData) })
     } catch (err) {
       next(err);
     }
@@ -71,7 +80,7 @@ const userController = {
         throw new Error('Cannot edit other users profile')
       }
       const { account, name, email, avatar, password, checkPassword, introduction } = req.body
-      const { banner } = req.files // 圖片存在req.files屬性中
+      const { banner } = req.files || {} // 圖片存在req.files屬性中&確保非空值
 
       // AC測試規定: 自我介紹字數上限 160 字、暱稱上限 50 字
       if (name && name.length > 50) throw new Error('name length should <= 50')
@@ -82,11 +91,11 @@ const userController = {
         throw new Error('user does not exist')
       }
 
-      //用bcrypt 加密函數進行密碼驗證
-      const passwordMatch = await bcrypt.compare(password, user.password);
-      if (!passwordMatch) {
-        throw new Error('Password check failed');
-      }
+      // //用bcrypt 加密函數進行密碼驗證
+      // const passwordMatch = await bcrypt.compare(password, user.password);
+      // if (!passwordMatch) {
+      //   throw new Error('Password check failed');
+      // }
 
       const avatarUrl = avatar ? await imgurFileHandler(avatar[0]) : null
       const bannerUrl = banner ? await imgurFileHandler(banner[0]) : null
@@ -110,7 +119,7 @@ const userController = {
   },
   getUserTweets: async (req, res, next) => {
     try {
-      const userId = Number(req.params.id);
+      const userId = req.params.userId
       const tweets = await Tweet.findAll({
         where: { UserId: userId },
         include: [
