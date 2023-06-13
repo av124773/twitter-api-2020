@@ -170,15 +170,71 @@ const userController = {
         nest: true
       })
 
-      const userLikesData = likes.map(reply => reply.toJSON())
+      const userLikesData = likes.map(like => like.toJSON())
       res.status(200).json(userLikesData)
     } catch (err) {
       next(err)
     }
   },
   getUserFollowings: async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+      const user = await User.findByPk(userId, {
+        attributes: { exclude: ['password'] }
+      });
+      if (!user) throw new Error('User does not exist');
+
+      const followings = await User.findAll({
+        include: [
+          {
+            model: User,
+            as: 'Followers',
+            attributes: { exclude: ['password'] }
+          }
+        ],
+        where: { id: userId },
+        order: [['createdAt', 'DESC']],
+      })
+      const userFollowingsData = {
+        user: {
+          ...user.toJSON(),
+          followers: followings[0]?.Followers || []
+        }
+      }
+      res.status(200).json(userFollowingsData);
+    } catch (err) {
+      next(err);
+    }
   },
   getUserFollowers: async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+      const user = await User.findByPk(userId, {
+        attributes: { exclude: ['password'] }
+      });
+      if (!user) throw new Error('User does not exist');
+
+      const followers = await User.findAll({
+        include: [
+          {
+            model: User,
+            as: 'Followers',
+            attributes: { exclude: ['password'] }
+          }
+        ],
+        where: { id: userId },
+        order: [['createdAt', 'DESC']],
+      })
+      const userFollowersData = {
+        user: {
+          ...user.toJSON(),
+          followers: followers[0]?.Followers || []
+        }
+      }
+      res.status(200).json(userFollowersData);
+    } catch (err) {
+      next(err);
+    }
   }
 }
 
