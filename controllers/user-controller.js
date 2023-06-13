@@ -90,34 +90,19 @@ const userController = {
       if (!user) {
         throw new Error('user does not exist')
       }
-
-      // console.log('account:', account)
-      // const checkUserData = await User.findOne({
-      //   where: {
-      //     [Op.or]: [
-      //       { account: account },
-      //       { email: email }
-      //     ]
-      //   }
-      // })
-      // if (checkUserData) {  
-      //   console.log('check:', checkUserData.get().account)
-      //   console.log('input:', account)
-      //   if (checkUserData.get().account === account && user.account !== account) {
-      //     throw new Error('Account already exist!')
-      //   } else if (checkUserData.get().email === email && user.email !== email ) {
-      //     throw new Error('email already exist!')
-      //   }
-      // }
-
-      const checkAccount = await User.findOne({ where: { account: account } })
-      if (checkAccount && account !== user.account) {
-        throw new Error('Account already exist!')
+      
+      if (account) {
+        const checkAccount = await User.findOne({ where: { account: account } })
+        if (checkAccount && account !== user.account) {
+          throw new Error('Account already exist!')
+        }
       }
-      const checkEmail = await User.findOne({ where: { email: email } })
-      if (checkEmail && email !== user.email) {
-        throw new Error('Email already exist!')
-      }
+      if (email) {
+        const checkEmail = await User.findOne({ where: { email: email } })
+        if (checkEmail && email !== user.email) {
+          throw new Error('Email already exist!')
+        }
+      }   
 
       // //用bcrypt 加密函數進行密碼驗證
       // const passwordMatch = await bcrypt.compare(password, user.password);
