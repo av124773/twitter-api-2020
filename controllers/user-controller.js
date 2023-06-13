@@ -90,6 +90,26 @@ const userController = {
       if (!user) {
         throw new Error('user does not exist')
       }
+
+      // console.log('account:', account)
+      // const checkUserData = await User.findOne({
+      //   where: {
+      //     [Op.or]: [
+      //       { account: account },
+      //       { email: email }
+      //     ]
+      //   }
+      // })
+      // if (checkUserData) {  
+      //   console.log('check:', checkUserData.get().account)
+      //   console.log('input:', account)
+      //   if (checkUserData.get().account === account && user.account !== account) {
+      //     throw new Error('Account already exist!')
+      //   } else if (checkUserData.get().email === email && user.email !== email ) {
+      //     throw new Error('email already exist!')
+      //   }
+      // }
+
       const checkAccount = await User.findOne({ where: { account: account } })
       if (checkAccount && account !== user.account) {
         throw new Error('Account already exist!')
