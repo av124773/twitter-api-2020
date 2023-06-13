@@ -170,13 +170,43 @@ const userController = {
         nest: true
       })
 
-      const userLikesData = likes.map(reply => reply.toJSON())
+      const userLikesData = likes.map(like => like.toJSON())
       res.status(200).json(userLikesData)
     } catch (err) {
       next(err)
     }
   },
   getUserFollowings: async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+      const user = await User.findByPk(userId, {
+        attributes: { exclude: ['password'] }
+      });
+      if (!user) throw new Error('User does not exist');
+
+      const followings = await Followship.findAll({
+        where: { followerId: userId },
+        include: [
+          {
+            model: User,
+            as: 'Following',
+            attributes: { exclude: ['password'] }
+          }
+        ],
+        order: [['createdAt', 'DESC']],
+        // nest: true
+      });
+
+      const ThisUserId = helpers.getUser(req).id
+      const userFollowingsData = followings.map(following => ({
+        ...following.toJSON(),
+        isCurrentUserFollowed:
+          following.followerId.toString() === ThisUserId.toString()
+      }))
+      res.status(200).json(userFollowingsData)
+    } catch (err) {
+      next(err)
+    }
   },
   getUserFollowers: async (req, res, next) => {
   }
