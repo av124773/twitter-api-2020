@@ -58,7 +58,8 @@ const followshipController = {
   getTopUser: (req, res, next) => {
     return User.findAll({
       include: [{ model: User, as: 'Followers', attributes: { exclude: ['password'] } }],
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
+      limit: 10 //只取前10
     })
       .then(users => {
         const result = users
