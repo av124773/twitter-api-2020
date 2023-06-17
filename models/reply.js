@@ -1,19 +1,3 @@
-// 'use strict';
-// module.exports = (sequelize, DataTypes) => {
-//   const Reply = sequelize.define('Reply', {
-//     UserId: DataTypes.INTEGER,
-//     TweetId: DataTypes.INTEGER,
-//     comment: DataTypes.TEXT
-//   }, {
-//     tableName: 'Replies',
-//     underscored: true,
-//   });
-//   Reply.associate = function(models) {
-//     Reply.belongsTo(models.User, { foreignKey: 'userId' })
-//   };
-//   return Reply;
-// };
-
 'use strict'
 const {
   Model
@@ -25,11 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate (models) {
       Reply.belongsTo(models.User, { foreignKey: 'userId' })
       Reply.belongsTo(models.Tweet, { foreignKey: 'tweetId' })
     }
-  };
+  }
   Reply.init({
     UserId: DataTypes.INTEGER,
     TweetId: DataTypes.INTEGER,
@@ -37,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Reply',
-    tableName: 'Replies',
+    tableName: 'Replies'
   })
   return Reply
 }
