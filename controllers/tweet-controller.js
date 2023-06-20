@@ -3,50 +3,103 @@ const { Tweet, User, Reply, Like } = require('../models')
 const helpers = require('../_helpers')
 
 const tweetController = {
+  // getTweets: async (req, res, next) => {
+  //   try {
+  //     const ThisUserId = helpers.getUser(req).id
+  //     const tweets = await Tweet.findAll({
+  //       include: [
+  //         { model: User, attributes: { exclude: ['password'] } },
+  //         {
+  //           model: Like,
+  //           attributes: []
+  //         }
+  //       ],
+  //       attributes: [
+  //         'id',
+  //         'UserId',
+  //         'description',
+  //         'createdAt',
+  //         'updatedAt',
+  //         [
+  //           sequelize.literal(
+  //             '(SELECT COUNT(*) FROM Likes WHERE Likes.TweetId = Tweet.id AND Likes.deletedAt IS NULL)'
+  //           ),
+  //           'likeCount'
+  //         ],
+  //         [
+  //           sequelize.literal(
+  //             '(SELECT COUNT(*) FROM Replies WHERE Replies.TweetId = Tweet.id)'
+  //           ),
+  //           'replyCount'
+  //         ],
+  //         [
+  //           sequelize.literal(
+  //             `(SELECT COUNT(*) FROM Likes WHERE Likes.TweetId = Tweet.id AND Likes.UserId = ${ThisUserId} AND Likes.deletedAt IS NULL) > 0`
+  //           ),
+  //           'isLiked'
+  //         ]
+  //       ],
+  //       order: [['createdAt', 'DESC']]
+  //     })
+  //     const tweetsData = tweets.map(tweet => {
+  //       return {
+  //         ...tweet.toJSON(),
+  //         isLiked: Boolean(tweet.dataValues.isLiked)
+  //       }
+  //     })
+  //     res.json(tweetsData)
+  //   } catch (err) {
+  //     next(err)
+  //   }
+  // },
   getTweets: async (req, res, next) => {
     try {
-      const ThisUserId = helpers.getUser(req).id
       const tweets = await Tweet.findAll({
         include: [
           { model: User, attributes: { exclude: ['password'] } },
           {
             model: Like,
-            attributes: []
+            attributes: [],
+            where: { deletedAt: null },
+            required: false
+          },
+          {
+            model: Reply,
+            attributes: [],
+            required: false
           }
         ],
-        attributes: [
-          'id',
-          'UserId',
-          'description',
-          'createdAt',
-          'updatedAt',
-          [
-            sequelize.literal(
-              '(SELECT COUNT(*) FROM Likes WHERE Likes.TweetId = Tweet.id AND Likes.deletedAt IS NULL)'
-            ),
-            'likeCount'
-          ],
-          [
-            sequelize.literal(
-              '(SELECT COUNT(*) FROM Replies WHERE Replies.TweetId = Tweet.id)'
-            ),
-            'replyCount'
-          ],
-          [
-            sequelize.literal(
-              `(SELECT COUNT(*) FROM Likes WHERE Likes.TweetId = Tweet.id AND Likes.UserId = ${ThisUserId} AND Likes.deletedAt IS NULL) > 0`
-            ),
-            'isLiked'
+        attributes: {
+          include: [
+            [
+              sequelize.fn('COUNT',
+              sequelize.fn('DISTINCT', sequelize.col('Likes.id'))),
+              'likeCount'
+            ],
+            [
+              sequelize.fn('COUNT', 
+              sequelize.fn('DISTINCT', sequelize.col('Replies.id'))), 
+              'replyCount'
+            ],
+            [
+              sequelize.literal(
+                `CASE WHEN Likes.id IS NOT NULL THEN true ELSE false END`
+              ),
+              'isLiked'
+            ]
           ]
-        ],
-        order: [['createdAt', 'DESC']]
+        },
+        group: ['Tweet.id'],
+        order: [['createdAt', 'DESC']],
       })
+
       const tweetsData = tweets.map(tweet => {
         return {
           ...tweet.toJSON(),
           isLiked: Boolean(tweet.dataValues.isLiked)
         }
       })
+
       res.json(tweetsData)
     } catch (err) {
       next(err)
